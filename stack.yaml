@@ -1,0 +1,5 @@
+resolver: lts-5.5
+extra-deps:
+- liquidhaskell-cabal-0.1.1.0
+explicit-setup-deps:
+  "*": true
