@@ -1,6 +1,10 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
+-- | Modelling a calendar date statically.
+
 module Date where
+
+-- We define invariants on dates, such as how many days per month, including leap years.
 
 {-@ type Day =
   {v:Int | v > 0 && v <= 31 } @-}
@@ -10,6 +14,8 @@ module Date where
 
 {-@ type Year month day =
   {v:Int | v > 0 && (month /= 2 || (day < 29 || v mod 400 = 0 || (v mod 4 = 0 && v mod 100 /= 0))) } @-}
+
+-- We define a date type with a shadow liquid type encoding our invariants.
 
 data Date = Date
   { day :: !Int
@@ -21,6 +27,8 @@ data Date = Date
   , month :: Month day
   , year  :: Year month day
   } @-}
+
+-- In order to construct a valid `Date`, we need to do all the proper runtime tests.
 
 main :: IO ()
 main = do
@@ -39,6 +47,8 @@ main = do
       (month /= 2 ||
        (day < 29 || mod year 400 == 0 || (mod year 4 == 0 && mod year 100 /= 0)))
 
+
+-- Examples:
 
 works :: Date
 works = Date 12 03 2017
