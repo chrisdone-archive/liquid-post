@@ -12,6 +12,7 @@ library
  hs-source-dirs: examples
  other-modules:
    FromJust
+   Tree
    Numbers
    Impossible
    DivByZero

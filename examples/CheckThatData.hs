@@ -11,5 +11,5 @@ calc = do
   putStrLn "Enter denominator"
   d <- readLn
   if d > 0
-     then putStrLn ("Result = " ++ show (safeDiv n d))
+     then putStrLn ("Result = " ++ show (divide n d))
      else putStrLn "It's zero!"

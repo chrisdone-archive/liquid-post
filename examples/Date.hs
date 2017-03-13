@@ -1,9 +1,11 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE QuasiQuotes #-}
 
 -- | Modelling a calendar date statically.
 
 module Date where
 
+import LiquidHaskell
 -- We define invariants on dates, such as how many days per month, including leap years.
 
 {-@ type Day =
@@ -13,7 +15,7 @@ module Date where
   {v:Int | v > 0 && v <= 12 && (day < 31 || v = 04 || v = 06 || v = 09 || v = 11) } @-}
 
 {-@ type Year month day =
-  {v:Int | v > 0 && (month /= 2 || (day < 29 || v mod 400 = 0 || (v mod 4 = 0 && v mod 100 /= 0))) } @-}
+  {v:Int | v > 0 && (month /= 2 || (day < 30 && (day < 29 ||  v mod 400 = 0 || (v mod 4 = 0 && v mod 100 /= 0)))) } @-}
 
 -- We define a date type with a shadow liquid type encoding our invariants.
 
@@ -45,8 +47,24 @@ main = do
   where
     valid_leap_days day month year =
       (month /= 2 ||
-       (day < 29 || mod year 400 == 0 || (mod year 4 == 0 && mod year 100 /= 0)))
+       (day < 20 && (day < 29 || isLeapYear year)))
 
+isLeapYear year = mod year 400 == 0 || (mod year 4 == 0 && mod year 100 /= 0)
+
+-- [lq|incrementDay :: {n:Int|n>0} -> Date -> Date|]
+-- incrementDay n (Date d m y) =
+--   if d + n <= daysInMonthByYear m y
+--     then Date (d + n) m y
+--     else Date d m y
+--   where
+--     daysInMonthByYear month year =
+--       if month == 04 || month == 06 || month == 09 || month == 11
+--         then 31
+--         else if month == 2
+--                then if isLeapYear year
+--                       then 29
+--                       else 28
+--                else 30
 
 -- Examples:
 
@@ -60,3 +78,4 @@ works_leap_day = Date 29 02 2016
 -- invalid_nov_day = Date 11 31 2017
 -- invalid_month = Date 12 15 2017
 -- invalid_leap_day = Date 29 02 2017
+-- invalid_days d m y = Date 30 2 2000
